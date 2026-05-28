@@ -1,0 +1,73 @@
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+
+# =========================
+# Python / FastAPI
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+.venv/
+venv/
+env/
+ENV/
+
+*.log
+
+
+# =========================
+# Node / React / Vite
+# =========================
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+
+.vite/
+frontend/.vite/
+
+
+# =========================
+# Project outputs
+# =========================
+outputs/
+backend/outputs/
+frontend/outputs/
+
+data/tmp/
+data/cache/
+
+review_history.json
+*.sqlite
+*.db
+
+
+# =========================
+# IDE
+# =========================
+.idea/
+.vscode/
+
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
