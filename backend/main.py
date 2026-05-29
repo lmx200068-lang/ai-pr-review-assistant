@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes.health import router as health_router
-from .routes.review_tasks import router as review_tasks_router
+if __package__ in {None, ""}:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+    from backend.routes.health import router as health_router
+    from backend.routes.review_tasks import router as review_tasks_router
+else:
+    from .routes.health import router as health_router
+    from .routes.review_tasks import router as review_tasks_router
 
 
 app = FastAPI(

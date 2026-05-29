@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, Field, HttpUrl, model_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
 
 
 class TaskStatus(str, Enum):
@@ -27,6 +27,7 @@ class ReviewSource(str, Enum):
     LLM = "llm"
     MOCK = "mock"
     FALLBACK = "fallback"
+    LOCAL_FALLBACK = "local_fallback"
 
 
 class FileType(str, Enum):
@@ -66,10 +67,13 @@ class PullRequestInfo(BaseModel):
     changed_files: int
     html_url: str | None = None
     state: str | None = None
+    head_sha: str | None = None
+    base_sha: str | None = None
 
 
 class ChangedFile(BaseModel):
     filename: str
+    previous_filename: str | None = None
     status: str
     additions: int
     deletions: int
@@ -85,7 +89,7 @@ class ReviewFinding(BaseModel):
     id: str
     severity: Severity
     file_path: str
-    line: int
+    line: int | None = Field(default=None, ge=1)
     file_type: FileType
     review_strategy: ReviewStrategy
     title: str
@@ -93,17 +97,31 @@ class ReviewFinding(BaseModel):
     evidence_lines: list[str] = Field(default_factory=list, max_length=8)
     suggestion: str
 
+    @field_validator("line", mode="before")
+    @classmethod
+    def normalize_line(cls, value: object) -> object:
+        if value in (None, "", 0, "0"):
+            return None
+        return value
+
 
 class LLMReviewFinding(BaseModel):
     severity: Severity
     file_path: str
-    line: int = Field(..., ge=1)
+    line: int | None = Field(default=None, ge=1)
     file_type: FileType | None = None
     review_strategy: ReviewStrategy | None = None
     title: str = Field(..., min_length=1)
     summary: str = Field(..., min_length=1)
     evidence_lines: list[str] = Field(default_factory=list, max_length=8)
     suggestion: str = Field(..., min_length=1)
+
+    @field_validator("line", mode="before")
+    @classmethod
+    def normalize_line(cls, value: object) -> object:
+        if value in (None, "", 0, "0"):
+            return None
+        return value
 
 
 class ReviewSummary(BaseModel):
@@ -123,6 +141,56 @@ class ReviewSummary(BaseModel):
 class LLMReviewPayload(BaseModel):
     summary: ReviewSummary
     findings: list[LLMReviewFinding] = Field(default_factory=list, max_length=12)
+    pending_findings: list[LLMReviewFinding] = Field(
+        default_factory=list,
+        max_length=12,
+    )
+
+
+class FileContentContext(BaseModel):
+    path: str
+    ref: str | None = None
+    source: Literal["base", "head", "hunk", "related"] = "head"
+    content: str = ""
+    truncated: bool = False
+    skipped: bool = False
+    skip_reason: str | None = None
+
+
+class RelatedFileContext(BaseModel):
+    path: str
+    relation: str
+    content: str = ""
+    truncated: bool = False
+    skipped: bool = False
+    skip_reason: str | None = None
+
+
+class ChangedFileContext(BaseModel):
+    path: str
+    file_type: str | None = None
+    review_strategy: str | None = None
+    patch: str | None = None
+    head_context: FileContentContext | None = None
+    base_context: FileContentContext | None = None
+    hunk_context: FileContentContext | None = None
+    related_files: list[RelatedFileContext] = Field(default_factory=list)
+    context_warnings: list[str] = Field(default_factory=list)
+
+
+class RepositoryContext(BaseModel):
+    tree_summary: str = ""
+    key_files: list[str] = Field(default_factory=list)
+    truncated: bool = False
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ReviewContextPack(BaseModel):
+    pr: PullRequestInfo
+    changed_files: list[ChangedFile]
+    changed_file_contexts: list[ChangedFileContext] = Field(default_factory=list)
+    repository_context: RepositoryContext | None = None
+    context_warnings: list[str] = Field(default_factory=list)
 
 
 class ReviewTask(BaseModel):
@@ -140,6 +208,7 @@ class ReviewTask(BaseModel):
     message: str
     pr: PullRequestInfo | None = None
     changed_files: list[ChangedFile] = Field(default_factory=list)
+    context_summary: dict[str, object] | None = None
     summary: ReviewSummary | None = None
     findings: list[ReviewFinding] = Field(default_factory=list)
     pending_findings: list[ReviewFinding] = Field(default_factory=list)

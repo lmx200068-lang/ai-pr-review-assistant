@@ -125,6 +125,7 @@ def make_changed_file(
     additions: int,
     deletions: int,
     changes: int,
+    previous_filename: str | None = None,
     patch: str | None = None,
     patch_truncated: bool = False,
     blob_url: str | None = None,
@@ -132,6 +133,7 @@ def make_changed_file(
     file_type, review_strategy = classify_changed_file(filename)
     return ChangedFile(
         filename=filename,
+        previous_filename=previous_filename,
         status=status,
         additions=additions,
         deletions=deletions,

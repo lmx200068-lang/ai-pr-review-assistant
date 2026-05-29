@@ -1,20 +1,22 @@
 from ..config import LLM_FALLBACK_TO_MOCK, LLM_MODEL, USE_MOCK_LLM
 from ..schemas import (
-    ChangedFile,
     DataSource,
-    PullRequestInfo,
     ReviewFinding,
+    ReviewContextPack,
     ReviewSource,
     ReviewSummary,
 )
 from .llm_review import run_real_llm_review
-from .mock_data import build_mock_findings, build_mock_summary
+from .mock_data import (
+    build_local_fallback_pending_findings,
+    build_mock_findings,
+    build_mock_summary,
+)
 
 
 def run_review_engine(
-    pr: PullRequestInfo,
+    context_pack: ReviewContextPack,
     depth: str,
-    files: list[ChangedFile],
     data_source: DataSource,
 ) -> tuple[
     ReviewSummary,
@@ -23,24 +25,59 @@ def run_review_engine(
     ReviewSource,
     str | None,
     str | None,
+    list[str],
 ]:
     if USE_MOCK_LLM:
-        findings = build_mock_findings(pr, depth, files, data_source)
+        findings = build_mock_findings(
+            context_pack.pr,
+            depth,
+            context_pack.changed_files,
+            data_source,
+        )
         summary = build_mock_summary(depth, len(findings), data_source)
-        return summary, findings, [], ReviewSource.MOCK, None, None
+        return summary, findings, [], ReviewSource.MOCK, None, None, []
 
     try:
-        summary, findings, pending_findings = run_real_llm_review(pr, depth, files)
-        return summary, findings, pending_findings, ReviewSource.LLM, LLM_MODEL, None
+        (
+            summary,
+            findings,
+            pending_findings,
+            validation_warnings,
+        ) = run_real_llm_review(context_pack, depth)
+        return (
+            summary,
+            findings,
+            pending_findings,
+            ReviewSource.LLM,
+            LLM_MODEL,
+            None,
+            validation_warnings,
+        )
     except Exception as exc:
         if not LLM_FALLBACK_TO_MOCK:
             raise
 
-        findings = build_mock_findings(pr, depth, files, data_source)
-        summary = build_mock_summary(depth, len(findings), data_source)
         error = f"{type(exc).__name__}: {exc}"
-        summary.verdict = (
-            "LLM review failed, so this task fell back to local mock review. "
-            f"Original error: {error[:180]}"
+        pending_findings = build_local_fallback_pending_findings(
+            context_pack.changed_files,
+            error,
         )
-        return summary, findings, [], ReviewSource.FALLBACK, LLM_MODEL or None, error
+        summary = ReviewSummary(
+            verdict=(
+                "LLM review failed. Local fallback only provides heuristic "
+                "suggestions and no formal findings."
+            ),
+            score=0,
+            checks_total=max(1, len(context_pack.changed_files)),
+            checks_passed=0,
+            estimated_review_minutes=1,
+        )
+        return (
+            summary,
+            [],
+            pending_findings,
+            ReviewSource.LOCAL_FALLBACK,
+            LLM_MODEL or None,
+            error,
+            [],
+        )

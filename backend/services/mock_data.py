@@ -246,3 +246,43 @@ def build_mock_findings(
         ]
 
     return findings
+
+
+def build_local_fallback_pending_findings(
+    files: list[ChangedFile],
+    error: str,
+    max_items: int = 4,
+) -> list[ReviewFinding]:
+    pending_findings: list[ReviewFinding] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    for index, file in enumerate(files[:max_items]):
+        title = "Heuristic review suggestion"
+        summary = (
+            "LLM review failed. This is a local heuristic suggestion based on "
+            "file metadata and diff size, not a confirmed AI finding."
+        )
+        evidence = "No validated LLM evidence available."
+        key = (file.filename, title, evidence)
+        if key in seen:
+            continue
+        seen.add(key)
+        pending_findings.append(
+            ReviewFinding(
+                id=f"local-fallback-{index + 1}",
+                severity=Severity.MEDIUM,
+                file_path=file.filename,
+                line=None,
+                file_type=file.file_type,
+                review_strategy=file.review_strategy,
+                title=title,
+                summary=summary,
+                evidence_lines=[],
+                suggestion=(
+                    "Manually review this changed file. "
+                    f"Original LLM error: {error[:160]}"
+                ),
+            )
+        )
+
+    return pending_findings
