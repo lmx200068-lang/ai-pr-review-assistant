@@ -96,6 +96,9 @@ class ReviewFinding(BaseModel):
     summary: str
     evidence_lines: list[str] = Field(default_factory=list, max_length=8)
     suggestion: str
+    comment_title: str | None = None
+    comment_summary: str | None = None
+    comment_suggestion: str | None = None
 
     @field_validator("line", mode="before")
     @classmethod
@@ -115,6 +118,9 @@ class LLMReviewFinding(BaseModel):
     summary: str = Field(..., min_length=1)
     evidence_lines: list[str] = Field(default_factory=list, max_length=8)
     suggestion: str = Field(..., min_length=1)
+    comment_title: str | None = None
+    comment_summary: str | None = None
+    comment_suggestion: str | None = None
 
     @field_validator("line", mode="before")
     @classmethod

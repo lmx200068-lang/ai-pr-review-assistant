@@ -19,8 +19,8 @@ export default function TaskProgress({ task }) {
   return (
     <section className="tool-panel status-panel">
       <div className="panel-heading">
-        <p className="eyebrow">当前任务</p>
-        <h2>{task ? STATUS_LABELS[task.status] || task.status : '暂无任务'}</h2>
+        <p className="eyebrow">Current Task</p>
+        <h2>{task ? STATUS_LABELS[task.status] || task.status : 'No task'}</h2>
       </div>
 
       {task ? (
@@ -38,15 +38,15 @@ export default function TaskProgress({ task }) {
               <dd>{task.id}</dd>
             </div>
             <div>
-              <dt>深度</dt>
+              <dt>Depth</dt>
               <dd>{labelFrom(DEPTH_LABELS, task.review_depth)}</dd>
             </div>
             <div>
-              <dt>数据源</dt>
+              <dt>Data Source</dt>
               <dd>{labelFrom(DATA_SOURCE_LABELS, task.data_source || 'mock')}</dd>
             </div>
             <div>
-              <dt>Review 来源</dt>
+              <dt>Review Source</dt>
               <dd>{labelFrom(REVIEW_SOURCE_LABELS, reviewSource)}</dd>
             </div>
           </dl>
@@ -55,22 +55,23 @@ export default function TaskProgress({ task }) {
 
           {isLocalFallback ? (
             <div className="review-warning fallback-trust" role="status">
-              <strong>可信度提示</strong>
+              <strong>Trust Notice</strong>
               <span>
-                LLM 评审失败，本次只生成待确认建议，不作为正式风险结论。
+                LLM review failed. This task only generated pending notes and
+                should not be treated as verified risk output.
               </span>
             </div>
           ) : null}
 
           {task.status === 'failed' && task.review_error ? (
             <div className="review-warning" role="status">
-              <strong>失败详情</strong>
+              <strong>Failure Details</strong>
               <span>{task.review_error}</span>
             </div>
           ) : null}
         </>
       ) : (
-        <EmptyState>输入 PR URL 后即可开始一次 AI 评审。</EmptyState>
+        <EmptyState>Enter a PR URL to start an AI review.</EmptyState>
       )}
     </section>
   )

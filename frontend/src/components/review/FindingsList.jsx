@@ -3,8 +3,9 @@ import {
   isReviewingTask,
   isTerminalTask,
 } from '../../utils/formatters'
+import { groupFindings } from '../../utils/reviewFormatters'
 import EmptyState from '../common/EmptyState'
-import FindingCard from './FindingCard'
+import FindingGroupCard from './FindingGroupCard'
 
 export default function FindingsList({
   findings,
@@ -12,6 +13,8 @@ export default function FindingsList({
   focusedFinding,
   onSelectFinding,
 }) {
+  const groups = groupFindings(findings)
+
   if (!findings.length) {
     return (
       <EmptyState>
@@ -23,16 +26,19 @@ export default function FindingsList({
   return (
     <section className="formal-findings-section">
       <div className="changed-files-header">
-        <h3>正式风险 Findings</h3>
-        <span>{findings.length} 条证据已校验</span>
+        <h3>Verified Findings</h3>
+        <span>
+          {findings.length} verified finding{findings.length === 1 ? '' : 's'},
+          grouped into {groups.length} issue type{groups.length === 1 ? '' : 's'}
+        </span>
       </div>
       <div className="finding-list">
-        {findings.map((finding) => (
-          <FindingCard
-            finding={finding}
-            key={finding.id}
-            onSelect={onSelectFinding}
-            selected={focusedFinding?.id === finding.id}
+        {groups.map((group) => (
+          <FindingGroupCard
+            focusedFinding={focusedFinding}
+            group={group}
+            key={group.groupKey}
+            onSelectFinding={onSelectFinding}
           />
         ))}
       </div>

@@ -74,6 +74,13 @@ def normalize_string_list(value: object) -> list[str]:
     return [str(value)] if str(value).strip() else []
 
 
+def normalize_optional_string(value: object) -> str | None:
+    if value is None:
+        return None
+    normalized = str(value).strip()
+    return normalized or None
+
+
 def safe_int(value: object, default: int) -> int:
     try:
         return int(value)
@@ -148,6 +155,23 @@ def normalize_finding_item(item: object) -> dict[str, object] | None:
             item.get("suggestion")
             or item.get("recommendation")
             or "请人工复核该项。"
+        ),
+        "comment_title": normalize_optional_string(
+            item.get("comment_title")
+            or item.get("github_comment_title")
+            or item.get("title_en")
+        ),
+        "comment_summary": normalize_optional_string(
+            item.get("comment_summary")
+            or item.get("github_comment_summary")
+            or item.get("summary_en")
+            or item.get("description_en")
+        ),
+        "comment_suggestion": normalize_optional_string(
+            item.get("comment_suggestion")
+            or item.get("github_comment_suggestion")
+            or item.get("suggestion_en")
+            or item.get("recommendation_en")
         ),
     }
 
@@ -291,6 +315,9 @@ def is_security_sensitive_text(finding: LLMReviewFinding) -> bool:
             finding.title,
             finding.summary,
             finding.suggestion,
+            finding.comment_title or "",
+            finding.comment_summary or "",
+            finding.comment_suggestion or "",
             " ".join(finding.evidence_lines),
         ]
     ).lower()
@@ -342,6 +369,9 @@ def build_review_finding(
         summary=finding.summary,
         evidence_lines=evidence_lines,
         suggestion=finding.suggestion,
+        comment_title=finding.comment_title,
+        comment_summary=finding.comment_summary,
+        comment_suggestion=finding.comment_suggestion,
     )
 
 

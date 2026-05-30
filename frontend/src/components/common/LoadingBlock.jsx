@@ -1,5 +1,5 @@
 import EmptyState from './EmptyState'
 
-export default function LoadingBlock({ children = '正在加载' }) {
+export default function LoadingBlock({ children = 'Loading' }) {
   return <EmptyState>{children}</EmptyState>
 }

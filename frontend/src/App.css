@@ -368,7 +368,7 @@
 }
 
 .task-list button {
-  min-height: 58px;
+  min-height: 70px;
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -399,6 +399,11 @@
 
 .task-list button small {
   color: var(--muted);
+}
+
+.task-pr-url {
+  max-width: 100%;
+  color: var(--accent);
 }
 
 .status-dot {
@@ -774,6 +779,7 @@
 
 .finding-card {
   min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 12px;
   padding: 16px;
@@ -786,6 +792,10 @@
     border-color 0.16s ease,
     box-shadow 0.16s ease,
     transform 0.16s ease;
+}
+
+.finding-group-card {
+  cursor: default;
 }
 
 .finding-card:hover,
@@ -807,12 +817,55 @@
 }
 
 .finding-card-header {
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.finding-meta-chip {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finding-path {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent;
+  cursor: pointer;
+}
+
+.finding-path:hover,
+.finding-path:focus-visible,
+.impact-list button:hover,
+.impact-list button:focus-visible {
+  outline: none;
+  text-decoration: underline;
+}
+
+.finding-section {
+  min-width: 0;
+}
+
+.finding-section p {
+  overflow-wrap: anywhere;
 }
 
 .finding-path {
@@ -823,6 +876,60 @@
 .finding-card p {
   margin: 0;
   color: var(--muted);
+}
+
+.finding-title-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+}
+
+.finding-title-row h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.copy-action {
+  max-width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--accent);
+  font-weight: 700;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.copy-action:hover,
+.copy-action:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+  background: #eff6ff;
+}
+
+.impact-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.impact-list button {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .pending-badge {
@@ -837,6 +944,7 @@
 
 .finding-section,
 .evidence-block {
+  min-width: 0;
   display: grid;
   gap: 6px;
 }
@@ -847,20 +955,61 @@
 }
 
 .evidence-block {
+  max-width: 100%;
+  overflow: hidden;
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: #f8fafc;
 }
 
+.evidence-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.evidence-heading button {
+  padding: 0;
+  border: 0;
+  color: var(--accent);
+  font-weight: 700;
+  background: transparent;
+  cursor: pointer;
+}
+
 .evidence-block pre {
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 2px;
+  width: 100%;
   margin: 0;
   overflow-x: auto;
 }
 
+.group-evidence-item {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.group-evidence-item > span {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.group-evidence-item + .group-evidence-item {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 .evidence-block code {
+  display: block;
+  min-width: max-content;
   color: var(--text-strong);
   font: 12px/1.5 var(--mono);
   white-space: pre;
@@ -907,6 +1056,7 @@
 }
 
 .suggestion {
+  min-width: 0;
   display: grid;
   gap: 4px;
   padding-top: 10px;
@@ -919,6 +1069,7 @@
 
 .suggestion span {
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1120px) {

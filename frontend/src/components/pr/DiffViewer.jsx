@@ -31,7 +31,7 @@ export default function DiffViewer({ file, focusedFinding }) {
   }, [file, focusedIndex])
 
   if (!file) {
-    return <EmptyState>未选择变更文件。</EmptyState>
+    return <EmptyState>No changed file selected.</EmptyState>
   }
 
   return (
@@ -75,11 +75,11 @@ export default function DiffViewer({ file, focusedFinding }) {
           })}
         </div>
       ) : (
-        <EmptyState>GitHub 没有返回这个文件的文本 Diff。</EmptyState>
+        <EmptyState>GitHub did not return a textual diff for this file.</EmptyState>
       )}
 
       {file.patch_truncated ? (
-        <p className="patch-note">Diff 预览在评审前已截断。</p>
+        <p className="patch-note">Diff preview was truncated before review.</p>
       ) : null}
     </div>
   )

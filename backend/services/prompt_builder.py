@@ -203,7 +203,9 @@ def build_review_prompt(
         "Formal findings must include evidence_lines copied from the provided diff or context. "
         "If context is insufficient or evidence is weak, put the issue in pending_findings. "
         "Return strictly valid JSON. No markdown. No code fences. "
-        "Write findings in Simplified Chinese. Keep file paths and identifiers unchanged."
+        "Write title, summary, and suggestion in Simplified Chinese for the UI. "
+        "Also write comment_title, comment_summary, and comment_suggestion in clear English for copied GitHub comments. "
+        "Keep file paths, identifiers, package names, and code symbols unchanged."
     )
     user_prompt = f"""
 Review depth:
@@ -234,7 +236,10 @@ Return this exact JSON shape:
       "title": "short Chinese title",
       "summary": "evidence-based Chinese explanation",
       "evidence_lines": ["+ exact changed line copied from PATCH"],
-      "suggestion": "specific Chinese suggestion"
+      "suggestion": "specific Chinese suggestion",
+      "comment_title": "short English issue title for GitHub comments",
+      "comment_summary": "specific English explanation for GitHub comments",
+      "comment_suggestion": "specific English recommendation for GitHub comments"
     }}
   ],
   "pending_findings": [
@@ -247,7 +252,10 @@ Return this exact JSON shape:
       "title": "short Chinese title",
       "summary": "why this needs human confirmation",
       "evidence_lines": [],
-      "suggestion": "what a human should verify"
+      "suggestion": "what a human should verify",
+      "comment_title": "short English pending issue title",
+      "comment_summary": "English explanation of why this needs human confirmation",
+      "comment_suggestion": "English manual verification step"
     }}
   ]
 }}
@@ -259,6 +267,7 @@ Rules:
 - line must be a positive line number from the new side of the patch when possible.
 - evidence_lines must contain 1 to 4 exact lines copied from the provided Diff Patch, hunk_context, head_context, base_context, or Related Files.
 - If you cannot cite exact diff evidence for a possible issue, still return it with evidence_lines: [] so the product can place it in human confirmation instead of formal findings.
+- comment_title, comment_summary, and comment_suggestion must be English only. Do not include Chinese text in those fields.
 - Do not output generic style advice.
 - Do not assign high severity to documentation-only changes unless there is a concrete security-sensitive misstatement.
 - checks_total should be at least findings.length.

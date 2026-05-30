@@ -13,7 +13,7 @@ export default function ReviewForm({
   const isPrUrlValid = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d+\/?$/.test(
     prUrl.trim(),
   )
-  const githubAccessLabel = githubAccess === 'read_only' ? '只读' : '未知'
+  const githubAccessLabel = githubAccess === 'read_only' ? 'Read-only' : 'Unknown'
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -29,8 +29,8 @@ export default function ReviewForm({
   return (
     <form className="tool-panel input-panel" onSubmit={handleSubmit}>
       <div className="panel-heading">
-        <p className="eyebrow">评审目标</p>
-        <h2>创建任务</h2>
+        <p className="eyebrow">Review Target</p>
+        <h2>Create Review Task</h2>
       </div>
 
       <label className="field">
@@ -44,7 +44,7 @@ export default function ReviewForm({
       </label>
 
       <fieldset className="depth-control">
-        <legend>评审深度</legend>
+        <legend>Review Depth</legend>
         <div className="segments">
           {DEPTH_OPTIONS.map((option) => (
             <button
@@ -65,13 +65,15 @@ export default function ReviewForm({
         disabled={!isPrUrlValid || loading}
         type="submit"
       >
-        {loading ? '正在创建任务' : '开始 AI 评审'}
+        {loading ? 'Creating task' : 'Start AI Review'}
       </button>
 
       <div className="mock-note">
-        <strong>GitHub {githubAccessLabel}测试</strong>
+        <strong>GitHub {githubAccessLabel} Mode</strong>
         <span>
-          只读取 PR 元数据、changed files 和 Diff；不会自动写回 GitHub 评论，写回评论需要人工审查。
+          The system only reads PR metadata, changed files, and diff. It does not
+          automatically write comments back to GitHub. Any PR comment should be
+          manually reviewed before posting.
         </span>
       </div>
     </form>

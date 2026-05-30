@@ -88,11 +88,11 @@ export default function App() {
 
       <section className="tool-panel findings-panel">
         <div className="panel-heading">
-          <p className="eyebrow">评审输出</p>
+          <p className="eyebrow">Review Output</p>
           <h2>
             {findings.length || pendingFindings.length
-              ? `${findings.length} 条正式发现，${pendingFindings.length} 条待确认建议`
-              : '评审结果'}
+              ? `${findings.length} verified finding${findings.length === 1 ? '' : 's'}, ${pendingFindings.length} pending note${pendingFindings.length === 1 ? '' : 's'}`
+              : 'Review Result'}
           </h2>
         </div>
 
@@ -118,6 +118,7 @@ export default function App() {
           focusedFinding={focusedFinding}
           onSelectFinding={handleSelectFinding}
           pendingFindings={pendingFindings}
+          reviewSource={activeTask?.review_source}
         />
       </section>
     </AppShell>
