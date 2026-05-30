@@ -40,15 +40,17 @@ export default function ChangedFilesPanel({
     <section
       className="source-review"
       ref={sourceReviewRef}
-      aria-label="变更源码"
+      aria-label="Changed source files"
     >
       <div className="changed-files-header">
-        <h3>PR 变更文件</h3>
-        <span>已加载 {files.length} 个文件</span>
+        <h3>Changed Files</h3>
+        <span>
+          {files.length} file{files.length === 1 ? '' : 's'} loaded
+        </span>
       </div>
 
       <div className="source-layout">
-        <div className="changed-file-list" aria-label="变更文件">
+        <div className="changed-file-list" aria-label="Changed files">
           {files.map((file) => (
             <button
               className={
@@ -72,7 +74,9 @@ export default function ChangedFilesPanel({
               <span className="file-stats">
                 <span>+{file.additions}</span>
                 <span>-{file.deletions}</span>
-                <span>{file.changes} 处变更</span>
+                <span>
+                  {file.changes} change{file.changes === 1 ? '' : 's'}
+                </span>
               </span>
             </button>
           ))}

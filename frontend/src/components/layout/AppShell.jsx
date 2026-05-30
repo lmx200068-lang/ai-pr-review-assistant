@@ -3,7 +3,7 @@ export default function AppShell({ header, error, children }) {
     <main className="app-shell">
       {header}
       {error}
-      <section className="workspace" aria-label="PR 评审工作台">
+      <section className="workspace" aria-label="PR review workspace">
         {children}
       </section>
     </main>

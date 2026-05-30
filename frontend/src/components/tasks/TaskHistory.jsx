@@ -4,15 +4,19 @@ import EmptyState from '../common/EmptyState'
 import LoadingBlock from '../common/LoadingBlock'
 
 export default function TaskHistory({ tasks, activeTaskId, onSelect, loading }) {
+  function taskPrUrl(task) {
+    return task?.pr?.html_url || task?.pr_url || 'PR URL not loaded yet'
+  }
+
   return (
     <aside className="tool-panel history-panel">
       <div className="panel-heading">
-        <p className="eyebrow">最近任务</p>
-        <h2>任务队列</h2>
+        <p className="eyebrow">Recent Tasks</p>
+        <h2>Task Queue</h2>
       </div>
 
       {loading ? (
-        <LoadingBlock>正在加载任务</LoadingBlock>
+        <LoadingBlock>Loading tasks</LoadingBlock>
       ) : tasks.length ? (
         <div className="task-list">
           {tasks.slice(0, 5).map((task) => (
@@ -26,12 +30,15 @@ export default function TaskHistory({ tasks, activeTaskId, onSelect, loading }) 
               <span>
                 <strong>{STATUS_LABELS[task.status]}</strong>
                 <small>{formatDate(task.created_at)}</small>
+                <small className="task-pr-url" title={taskPrUrl(task)} translate="no">
+                  {taskPrUrl(task)}
+                </small>
               </span>
             </button>
           ))}
         </div>
       ) : (
-        <EmptyState>暂无任务</EmptyState>
+        <EmptyState>No tasks yet</EmptyState>
       )}
     </aside>
   )

@@ -6,7 +6,7 @@ export function formatDate(value) {
   }).format(new Date(value))
 }
 
-export function labelFrom(map, value, fallback = '未知') {
+export function labelFrom(map, value, fallback = 'Unknown') {
   return map[value] || value || fallback
 }
 
@@ -37,18 +37,18 @@ export function getTaskMessage(task, reviewSource) {
   }
   if (task.status === 'completed') {
     if (reviewSource === 'llm' || reviewSource === 'llm_validated') {
-      return 'LLM 评审已完成'
+      return 'LLM review completed'
     }
     if (reviewSource === 'local_fallback' || reviewSource === 'fallback') {
-      return 'LLM 评审失败，已生成本地启发式待确认建议'
+      return 'LLM review failed. The task fell back to local heuristic review.'
     }
     if (reviewSource === 'mock') {
-      return '本地 mock 评审已完成'
+      return 'Mock review completed'
     }
-    return '评审任务已完成'
+    return 'Review task completed'
   }
   if (task.status === 'failed') {
-    return task.message || '评审任务失败'
+    return task.message || 'Review task failed'
   }
   return task.message
 }
@@ -62,12 +62,12 @@ export function shouldShowReviewMeta(task) {
 
 export function getFindingsEmptyMessage(task, isGenerating) {
   if (isGenerating) {
-    return '正在生成评审发现'
+    return 'Generating review findings'
   }
   if (task?.status === 'completed') {
-    return '评审发现已生成'
+    return 'Review findings generated'
   }
-  return '本次评审没有需要展示的发现。'
+  return 'No findings to display for this review.'
 }
 
 export function normalizeFinding(finding) {

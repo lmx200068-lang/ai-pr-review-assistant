@@ -19,33 +19,33 @@ export default function ContextSummary({ contextSummary }) {
     <section className="context-summary">
       <div className="changed-files-header">
         <h3>Context Pack</h3>
-        <span>{contextSummary.enabled ? '已开启' : '未开启'}</span>
+        <span>{contextSummary.enabled ? 'Enabled' : 'Disabled'}</span>
       </div>
       <div className="context-grid">
         <div>
-          <span>变更上下文</span>
+          <span>Changed Context</span>
           <strong>{contextSummary.changed_context_files || 0}</strong>
         </div>
         <div>
-          <span>相关文件</span>
+          <span>Related Files</span>
           <strong>{contextSummary.related_files || 0}</strong>
         </div>
         <div>
-          <span>仓库结构</span>
-          <strong>{contextSummary.repo_tree_loaded ? '已读取' : '未读取'}</strong>
+          <span>Repository Tree</span>
+          <strong>{contextSummary.repo_tree_loaded ? 'Loaded' : 'Not loaded'}</strong>
         </div>
         <div>
-          <span>上下文预算</span>
+          <span>Context Budget</span>
           <strong>
-            {usedChars} / {maxChars || '未统计'}
+            {usedChars} / {maxChars || 'Not counted'}
           </strong>
         </div>
       </div>
       {truncatedFiles.length ? (
-        <p>已截断：{truncatedFiles.join(', ')}</p>
+        <p>Truncated Context: {truncatedFiles.join(', ')}</p>
       ) : null}
       {skippedFiles.length ? (
-        <p>已跳过：{skippedFiles.join(', ')}</p>
+        <p>Skipped Context: {skippedFiles.join(', ')}</p>
       ) : null}
       {warnings.length ? (
         <ul>

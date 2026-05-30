@@ -1,20 +1,61 @@
+import { useState } from 'react'
 import {
   FILE_TYPE_LABELS,
   REVIEW_STRATEGY_LABELS,
 } from '../../utils/constants'
+import {
+  copyTextToClipboard,
+  findingDisplaySummary,
+  findingDisplaySuggestion,
+  findingDisplayTitle,
+  formatFindingAsGithubComment,
+  formatPendingFindingAsGithubComment,
+} from '../../utils/reviewFormatters'
 import Badge from '../common/Badge'
 
 export default function FindingCard({
   finding,
   pending = false,
+  reviewSource = '',
   selected = false,
   onSelect,
 }) {
+  const [copied, setCopied] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const evidenceLines = finding.evidence_lines || []
+  const visibleEvidence = expanded ? evidenceLines : evidenceLines.slice(0, 3)
+  const fileTypeLabel =
+    FILE_TYPE_LABELS[finding.file_type] || finding.file_type || 'Unclassified'
+  const reviewStrategyLabel =
+    REVIEW_STRATEGY_LABELS[finding.review_strategy] ||
+    finding.review_strategy ||
+    'No review strategy'
+
   function handleKeyDown(event) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       onSelect?.(finding)
     }
+  }
+
+  async function handleCopy(event) {
+    event.stopPropagation()
+    const text = pending
+      ? formatPendingFindingAsGithubComment(finding, reviewSource)
+      : formatFindingAsGithubComment(finding)
+    await copyTextToClipboard(text)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1500)
+  }
+
+  function handleToggleEvidence(event) {
+    event.stopPropagation()
+    setExpanded((current) => !current)
+  }
+
+  function handleSelectLocation(event) {
+    event.stopPropagation()
+    onSelect?.(finding)
   }
 
   const cardClass = [
@@ -35,37 +76,59 @@ export default function FindingCard({
     >
       <div className="finding-card-header">
         <Badge type={finding.severity}>{finding.severity}</Badge>
-        <span>{FILE_TYPE_LABELS[finding.file_type] || finding.file_type}</span>
-        <span>
-          {REVIEW_STRATEGY_LABELS[finding.review_strategy] ||
-            finding.review_strategy}
+        <span className="finding-meta-chip" title="File type">
+          {fileTypeLabel}
         </span>
-        <span className="finding-path" translate="no">
+        <span className="finding-meta-chip" title="Review strategy">
+          {reviewStrategyLabel}
+        </span>
+        <button
+          className="finding-path"
+          onClick={handleSelectLocation}
+          title="Jump to PR Diff"
+          type="button"
+          translate="no"
+        >
           {finding.file_path}
-          {finding.line ? `:${finding.line}` : '：未定位行'}
-        </span>
+          {finding.line ? `:${finding.line}` : ':line unavailable'}
+        </button>
       </div>
-      <h3>{finding.title}</h3>
-      {pending ? <span className="pending-badge">待人工确认</span> : null}
+      <div className="finding-title-row">
+        <h3>{findingDisplayTitle(finding)}</h3>
+        <button className="copy-action" onClick={handleCopy} type="button">
+          {copied ? 'Copied' : pending ? 'Copy Pending Note' : 'Copy Comment'}
+        </button>
+      </div>
+      {pending ? <span className="pending-badge">Pending Confirmation</span> : null}
       <div className="finding-section">
-        <strong>问题说明</strong>
-        <p>{finding.summary}</p>
+        <strong>Details</strong>
+        <p>{findingDisplaySummary(finding)}</p>
       </div>
       <div className="evidence-block">
-        <strong>证据片段</strong>
-        {finding.evidence_lines.length ? (
+        <div className="evidence-heading">
+          <strong>{pending ? 'Evidence Status' : 'Evidence'}</strong>
+          {evidenceLines.length > 3 ? (
+            <button onClick={handleToggleEvidence} type="button">
+              {expanded ? 'Collapse Evidence' : 'Expand Evidence'}
+            </button>
+          ) : null}
+        </div>
+        {visibleEvidence.length ? (
           <pre translate="no">
-            {finding.evidence_lines.map((line, index) => (
+            {visibleEvidence.map((line, index) => (
               <code key={`${finding.id}-evidence-${index}`}>{line}</code>
             ))}
           </pre>
         ) : (
-          <span>LLM 未提供可校验的 Diff 行，需要人工确认。</span>
+          <span>
+            No validated diff line was found for this pending note. Manual
+            confirmation is required.
+          </span>
         )}
       </div>
       <div className="suggestion">
-        <strong>修改建议</strong>
-        <span>{finding.suggestion}</span>
+        <strong>{pending ? 'Manual Confirmation Suggested' : 'Suggestion'}</strong>
+        <span>{findingDisplaySuggestion(finding)}</span>
       </div>
     </article>
   )
